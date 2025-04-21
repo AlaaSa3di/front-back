@@ -3,6 +3,7 @@ import React from "react";
 import AdminLayout from "./AdminLayout";
 import DashboardMetrics from "./DashboardMetrics";
 import ArticlesList from "./ArticlesList";
+// import SpaceManagement from "./spaceManage"
 
 const AdminDashboard = () => {
   return (
@@ -12,6 +13,9 @@ const AdminDashboard = () => {
       <div className="mt-8">
         <ArticlesList />
       </div>
+      {/* <div className="mt-8">
+        <SpaceManagement />
+      </div> */}
     </AdminLayout>
   );
 };

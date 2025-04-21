@@ -110,16 +110,17 @@ useEffect(() => {
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const navLinks = [
-    { path: "/Categories", label: "Explore News" },
-    { path: "/About", label: "Our Universe" },
-    { path: "/Contact", label: "Mission Control" },
+    { path: "/screens", label: "Billboards" },
+    { path: "/space", label: "Join Us" },
+    { path: "/About", label: "About Us" },
+    { path: "/Contact", label: "Contact US" },
   ];
 
-  if (userData?.role === "journalist") {
-    navLinks.push({ path: "/NewsArticleCreation", label: "Add Article" });
-  } else {
-    navLinks.push({ path: userId ? "/ToBeJournalist" : "/login", label: "Join Us" });
-  }
+  // if (userData?.role === "journalist") {
+  //   navLinks.push({ path: "/NewsArticleCreation", label: "Add Article" });
+  // } else {
+  //   navLinks.push({ path: userId ? "/ToBeJournalist" : "/login", label: "Join Us" });
+  // }
 
   console.log(userData);
 
@@ -136,7 +137,7 @@ useEffect(() => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img src={logo} alt="ORBITRA" className="h-16" />
-            <span className="text-2xl font-bold text-white">ORBITRA</span>
+            {/* <span className="text-2xl font-bold text-white">ORBITRA</span> */}
           </Link>
 
           {/* Desktop Navigation */}

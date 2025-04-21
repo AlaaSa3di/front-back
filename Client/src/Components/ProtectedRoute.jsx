@@ -1,24 +1,26 @@
 // src/ProtectedRoute.jsx
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem("token");
-  const userData = localStorage.getItem("user");
-  // 'user' might be stored as a JSON string in localStorage when the user logs in
+  const { user, loading } = useAuth();
 
-  if (!token || !userData) {
-    // Not logged in at all
+  if (loading) {
+    // أثناء التحقق من المستخدم
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    // المستخدم غير مسجل الدخول
     return <Navigate to="/login" />;
   }
 
-  const user = JSON.parse(userData);
-  if (user.role !== requiredRole) {
-    // Logged in, but not an admin
+  if (requiredRole && user.role !== requiredRole) {
+    // مسجل الدخول ولكن ليس لديه الصلاحية المطلوبة
     return <Navigate to="/" />;
   }
 
-  // If role matches, render the children
   return children;
 };
 

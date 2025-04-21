@@ -10,7 +10,7 @@ const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        <Link
+        {/* <Link
           to="/admin"
           className="block px-4 py-2 rounded hover:bg-gray-200 transition"
         >
@@ -21,6 +21,18 @@ const Sidebar = () => {
           className="block px-4 py-2 rounded hover:bg-gray-200 transition"
         >
           Articles
+        </Link> */}
+        <Link
+          to="/admin/spaces"
+          className="block px-4 py-2 rounded hover:bg-gray-200 transition"
+        >
+          Space Management 
+        </Link>
+        <Link
+          to="/admin/bookings"
+          className="block px-4 py-2 rounded hover:bg-gray-200 transition"
+        >
+          Bookings
         </Link>
         {/* Add more links for journalists, users, etc. */}
       </nav>

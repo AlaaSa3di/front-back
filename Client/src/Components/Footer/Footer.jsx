@@ -14,7 +14,7 @@ const Footer = () => {
           <div className="mb-8 md:mb-0 md:max-w-xs">
             <div className="flex items-center mb-4">
               <img src={logo} alt="NASA Logo" className="w-30 " />
-              <h2 className="text-2xl font-bold text-[#FDB827]">ORBITRA</h2>
+              {/* <h2 className="text-2xl font-bold text-[#FDB827]">ORBITRA</h2> */}
             </div>
             <p className="text-[#F1F1F1]/80 text-sm">
               Delivering the latest space news, discoveries, and exploration updates in real time.

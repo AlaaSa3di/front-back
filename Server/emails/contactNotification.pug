@@ -1,0 +1,14 @@
+div(dir="rtl")
+  h2 رسالة تواصل جديدة
+  p 
+    strong الاسم: 
+    | #{name}
+  p 
+    strong البريد الإلكتروني: 
+    | #{email}
+  p 
+    strong الرسالة:
+  blockquote #{message}
+  p 
+    strong تاريخ الإرسال: 
+    | #{new Date().toLocaleString('ar-EG')}

@@ -1,11 +1,14 @@
 export { default as Home } from "./Home/Home.jsx";
 export { default as Navbar } from "./Navbar/Navbar.jsx";
-export { default as Login } from "./Login/Login.jsx";
-export { default as Register } from "./Register/Register.jsx";
+export { default as Login } from "./Login/Login.jsx";/////
+export { default as Register } from "./Register/Register.jsx";//////
 export { default as Categories } from "./Categories/Categories.jsx";
 export { default as ArticleDetails } from "./ArticleDetails/ArticleDetails.jsx";
 export { default as NewsArticleCreation } from "./NewsArticleCreation/NewsArticleCreation.jsx";
 export { default as ToBeJournalist } from "./ToBeJournalist/ToBeJournalist.jsx";
+export { default as SpaceForm } from "./Space/spaceForm.jsx";////
+export { default as ScreensListing } from "./Screens/screenList.jsx";////
+export { default as BookingForm } from "./booking/bookingForm.jsx";////
 export { default as Profile } from "./Profile/Profile.jsx";
 export { default as Bookmark } from "./Bookmark/Bookmark.jsx";
 export { default as About } from "./About/About.jsx";
