@@ -59,6 +59,13 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
+      console.log("Sending registration data:", {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+      });
+
       await register({
         fullName: formData.fullName,
         email: formData.email,
@@ -68,11 +75,28 @@ const Register = () => {
       navigate("/");
     } catch (error) {
       let errorMessage = "An error occurred during registration";
-      if (error.response?.status === 400) {
-        errorMessage = error.response.data.message || "Validation failed";
-      } else if (error.response?.status === 500) {
-        errorMessage = "Server error. Please try again later";
+      console.error("Registration error:", error);
+      
+      if (error.response) {
+        // الطلب تم وصله للخادم وحصل على رد
+        console.log("Error data:", error.response.data);
+        console.log("Error status:", error.response.status);
+        console.log("Error headers:", error.response.headers);
+        
+        errorMessage = error.response.data?.message || 
+                       error.response.data?.error || 
+                       error.response.data?.toString() || 
+                       "Validation failed";
+      } else if (error.request) {
+        // الطلب تم إرساله ولكن لم يتم استلام رد
+        console.log("Error request:", error.request);
+        errorMessage = "No response received from server";
+      } else {
+        // خطأ أثناء إعداد الطلب
+        console.log("Error message:", error.message);
+        errorMessage = error.message || "Request setup error";
       }
+      
       setErrors({ server: errorMessage });
     } finally {
       setIsSubmitting(false);

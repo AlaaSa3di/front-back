@@ -21,6 +21,12 @@ const ContactMessageSchema = new mongoose.Schema(
       minlength: [10, 'الرسالة يجب أن تحتوي على الأقل على 10 أحرف'],
       maxlength: [1000, 'الرسالة لا يمكن أن تتجاوز 1000 حرف']
     },
+    replies: [{
+      message: { type: String, required: true },
+      repliedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    repliedAt: Date,
     deleted: { 
       type: Boolean, 
       default: false 

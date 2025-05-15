@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // تسجيل مستخدم جديد
 export const register = async (userData) => {
-  const response = await axios.post('/api/auth/register', userData, { withCredentials: true });
+  const response = await axios.post('http://localhost:8000/api/auth/register', userData, { withCredentials: true });
   return response.data;
 };
 
@@ -19,7 +19,13 @@ export const getMe = async () => {
 };
 
 // تسجيل الخروج
+// export const logout = async () => {
+//   const response = await axios.post('/api/auth/logout', {}, { withCredentials: true });
+//   return response.data;
+// };
 export const logout = async () => {
-  const response = await axios.post('/api/auth/logout', {}, { withCredentials: true });
+  const response = await axios.post('http://localhost:8000/api/auth/logout', {}, { 
+    withCredentials: true 
+  });
   return response.data;
 };

@@ -86,49 +86,39 @@ import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 import logo from "../images/logo.png";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../contexts/AuthContext";
+import axios from "axios";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const userId = useSelector((state) => state.user.userId);
+  const { user, loading, logout } = useAuth();
 
-useEffect(() => {
-    if (userId) {
-      fetch(`http://localhost:8000/api/user/details/${userId}`)
-        .then((response) => response.json())
-        .then((data) => setUserData(data))
-        .catch((error) => console.error('Error fetching user data:', error));
-    }
-  }, [userId]);
+  useEffect(() => {
+    // لا حاجة لـ refetchUser هنا لأنها تتم تلقائياً عند تغيير المسار
+  }, [location.pathname]);
 
- 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   const navLinks = [
     { path: "/screens", label: "Billboards" },
     { path: "/space", label: "Join Us" },
     { path: "/About", label: "About Us" },
-    { path: "/Contact", label: "Contact US" },
+    { path: "/Contact", label: "Contact Us" },
   ];
 
-  // if (userData?.role === "journalist") {
-  //   navLinks.push({ path: "/NewsArticleCreation", label: "Add Article" });
-  // } else {
-  //   navLinks.push({ path: userId ? "/ToBeJournalist" : "/login", label: "Join Us" });
-  // }
-
-  console.log(userData);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove token
-    navigate("/login"); // Redirect to login page
-    window.location.reload(); // Refresh to clear Redux state (optional)
+  const handleLogout = async () => {
+    await axios.post('http://localhost:8000/api/auth/logout');
+  navigate("/login");
   };
+
+  if (loading) {
+    return <div className="h-16 bg-black"></div>;
+  }
 
   return (
     <>
@@ -136,12 +126,11 @@ useEffect(() => {
         <div className="container mx-auto px-4 flex justify-between items-center py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src={logo} alt="ORBITRA" className="h-16" />
-            {/* <span className="text-2xl font-bold text-white">ORBITRA</span> */}
+            <img src={logo} alt="Spot Flash" className="h-12 md:h-16" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -158,88 +147,131 @@ useEffect(() => {
           </div>
 
           {/* User Section */}
-          <div className="hidden md:block relative">
-            {userId ? (
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="flex items-center cursor-pointer space-x-2 focus:outline-none"
-                >
-                  <FaUserCircle size={32} className="text-white" />
-                  <span className="text-white font-medium">{userData?.fullName}</span>
-                </button>
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-black border border-gray-700 shadow-lg rounded-lg overflow-hidden">
-                    <Link to={`/Profile/${userId}`} className="block px-4 py-2 text-white hover:bg-gray-800">
-                      Profile
-                    </Link>
-                    <Link to="/Bookmark" className="block px-4 py-2 text-white hover:bg-gray-800">
-                      Bookmarks
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full cursor-pointer text-left px-4 py-2 text-red-500 hover:bg-gray-800"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
+          <div className="hidden lg:block relative">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <button
+                    onClick={toggleDropdown}
+                    className="flex items-center cursor-pointer space-x-2 focus:outline-none"
+                  >
+                    <FaUserCircle size={32} className="text-white" />Welcome ,
+                    <span className="text-white font-medium">
+                      {user.fullName || user.email.split('@')[0]}
+                    </span>
+                  </button>
+                  
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-black border border-gray-800 rounded-md shadow-lg py-1 z-50">
+                      <Link
+                        to="/Profile/:id"
+                        className="block px-4 py-2 text-white hover:bg-gray-800"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-800"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="border border-[#FDB827] text-[#FDB827] hover:bg-[#FDB827] hover:text-black transition duration-300 px-4 py-1 rounded uppercase text-sm font-bold"
-              >
-                LOGIN
-              </Link>
+              <div className="flex gap-4">
+                <Link
+                  to="/login"
+                  className="border border-[#FDB827] text-[#FDB827] hover:bg-[#FDB827] hover:text-black transition duration-300 px-4 py-1 rounded uppercase text-sm font-bold"
+                >
+                  LOGIN
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-[#FDB827] text-black hover:bg-[#e09e1a] transition duration-300 px-4 py-1 rounded uppercase text-sm font-bold"
+                >
+                  SIGN UP
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button onClick={toggleMenu} className="md:hidden text-white hover:text-[#FDB827]">
+          <button 
+            onClick={toggleMenu} 
+            className="lg:hidden text-white hover:text-[#FDB827]"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
             {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-black py-4">
-            <div className="container mx-auto px-4 space-y-4">
+          <div className="lg:hidden bg-black py-4 border-t border-gray-800">
+            <div className="container mx-auto px-4 space-y-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="block text-white hover:text-[#FDB827] py-2"
-                  onClick={toggleMenu}
+                  className={`block py-2 text-lg ${
+                    location.pathname === link.path
+                      ? "text-[#FDB827] font-medium"
+                      : "text-white hover:text-[#FDB827]"
+                  }`}
+                  onClick={closeMenu}
                 >
                   {link.label}
                 </Link>
               ))}
-              {userId ? (
-                <>
-                  <Link to="/Profile" className="block text-white hover:text-[#FDB827] py-2">
-                    Profile
-                  </Link>
-                  <Link to="/Bookmarks" className="block text-white hover:text-[#FDB827] py-2">
-                    Bookmarks
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left text-red-500 hover:text-red-400 py-2"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/Register"
-                  className="block border border-[#FDB827] text-[#FDB827] hover:bg-[#FDB827] hover:text-black transition duration-300 px-4 py-1 rounded uppercase text-sm font-bold"
-                  onClick={toggleMenu}
-                >
-                  SIGN UP
-                </Link>
-              )}
+              
+              <div className="pt-4 border-t border-gray-800 mt-4">
+                {user ? (
+                  <>
+                    <div className="flex items-center space-x-2 mb-4">
+                      <FaUserCircle size={24} className="text-white" />
+                      <span className="text-white font-medium">
+                        {user.fullName || user.email.split('@')[0]}
+                      </span>
+                    </div>
+                    <Link 
+                      to="/Profile/:id" 
+                      className="block text-white hover:text-[#FDB827] py-2"
+                      onClick={closeMenu}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        closeMenu();
+                      }}
+                      className="block w-full text-left text-red-500 hover:text-red-400 py-2"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col space-y-3 pt-2">
+                    <Link
+                      to="/login"
+                      className="block border border-[#FDB827] text-center text-[#FDB827] hover:bg-[#FDB827] hover:text-black transition duration-300 px-4 py-2 rounded uppercase text-sm font-bold"
+                      onClick={closeMenu}
+                    >
+                      LOGIN
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block bg-[#FDB827] text-center text-black hover:bg-[#e09e1a] transition duration-300 px-4 py-2 rounded uppercase text-sm font-bold"
+                      onClick={closeMenu}
+                    >
+                      SIGN UP
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

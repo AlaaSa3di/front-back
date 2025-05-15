@@ -1,10 +1,10 @@
 // src/Components/AdminDashboard/TopNav.jsx
 import React from "react";
+import Cookies from 'js-cookie';
 
 const TopNav = () => {
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    Cookies.remove('token');
     window.location.href = "/login";
   };
 

@@ -52,7 +52,10 @@ router.put('/profile', upload.single('profilePicture'), userController.updateUse
 
 // Admin-only routes
 router.get('/', checkRole(['admin']), userController.getAllUsers);
-
+router.get('/deleted', checkRole(['admin']), userController.getDeletedUsers);
+router.patch('/:id/delete', checkRole(['admin']), userController.softDeleteUser);
+router.patch('/:id/restore', checkRole(['admin']), userController.restoreUser);
+router.patch('/:id/role', checkRole(['admin']), userController.updateUserRole);
 // User management routes
 router.delete('/', userController.deleteUser);
 

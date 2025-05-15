@@ -27,6 +27,8 @@ import AdminDashboard from "./Components/AdminDashboard/AdminDashboard";
 import SpaceManagement from "./Components/AdminDashboard/spaceManage";
 import AddScreen from './Components/AdminDashboard/AddScreen';
 import BookingsPage from './Components/AdminDashboard/Bookings';
+import UserManagement from './Components/AdminDashboard/UserManagement';
+import ContactMessages from './Components/AdminDashboard/ContactMessages';
 // import AdminArticleDetails from "./Components/AdminDashboard/AdminArticleDetails";
 // import ProtectedRoute from "./Components/ProtectedRoute";
 import AboutUs from "./Components/About/About";
@@ -114,7 +116,9 @@ function App() {
         { index: true, element: <AdminDashboard /> },
         { path: "spaces", element: <SpaceManagement /> },
         { path: "bookings", element: <BookingsPage /> },
-        { path: "spaces/:spaceId/add-screen", element: <AddScreen /> }, // <--- This route
+        { path: "users", element: <UserManagement /> },
+        { path: "spaces/:spaceId/add-screen", element: <AddScreen /> },
+        { path: "contact-messages", element: <ContactMessages/>} // <--- This route
         // { path: "users", element: <AdminUsers /> },
       ],
       errorElement: <PageNotFound />,

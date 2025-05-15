@@ -23,16 +23,28 @@ const Sidebar = () => {
           Articles
         </Link> */}
         <Link
+          to="/admin/users"
+          className="block px-4 py-2 rounded hover:bg-gray-200 transition"
+        >
+          User Management
+        </Link>
+        <Link
           to="/admin/spaces"
           className="block px-4 py-2 rounded hover:bg-gray-200 transition"
         >
-          Space Management 
+          Space Management
         </Link>
         <Link
           to="/admin/bookings"
           className="block px-4 py-2 rounded hover:bg-gray-200 transition"
         >
           Bookings
+        </Link>
+        <Link
+          to="/admin/contact-messages"
+          className="block px-4 py-2 rounded hover:bg-gray-200 transition"
+        >
+          Massages
         </Link>
         {/* Add more links for journalists, users, etc. */}
       </nav>

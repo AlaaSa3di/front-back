@@ -16,7 +16,6 @@
 // const authRoutes = require('./Routes/authRoutes');
 // const spaceRoutes = require('./Routes/spaceRoutes');
 // const screenRoutes = require('./Routes/screenRoutes');
-// const contactRoutes = require('./Routes/contactRoutes');
 
 // const app = express();
 // const PORT = process.env.PORT || 5000;
@@ -51,7 +50,6 @@
 // app.use("/api/users", userRoutes);
 // app.use('/api/spaces', spaceRoutes);
 // app.use('/api/screens', screenRoutes);
-// app.use('/api/contact', contactRoutes);
 // app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // // Connect to MongoDB
@@ -90,6 +88,7 @@ const userRoutes = require("./Routes/userRoutes");
 const authRoutes = require('./Routes/authRoutes');
 const spaceRoutes = require('./Routes/spaceRoutes');
 const screenRoutes = require('./Routes/screenRoutes');
+const contactRoutes = require('./Routes/contactRouter');
 const booking = require('./Routes/bookingRoutes');
 const paymentRoutes = require('./Routes/paymentRoutes');
 
@@ -124,6 +123,7 @@ app.use('/api/screens', screenRoutes);
 app.use('/api/bookings',booking );
 app.use('/api/payments', paymentRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/api/contacts', contactRoutes);
 
 
 
