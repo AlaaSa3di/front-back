@@ -31,7 +31,7 @@
 ---
 
 ## 📂 **Resources**  
-- 📄 [**Documentation**](https://drive.google.com/drive/folders/1NO4dw5Iis8HcWJr9BoByIuzJXVlL-hFr?usp=sharing) *(Coming Soon)*  
+- 📄 [**Documentation**](https://drive.google.com/drive/folders/1NO4dw5Iis8HcWJr9BoByIuzJXVlL-hFr?usp=sharing)  
 - 🎨 [**Figma Design**](https://www.figma.com/design/VgMeff38wyjvBusL1E5ZBM/YOUR-AD-IS-EASY?node-id=0-1&t=Z1eYOuIzTmpKK851-1) *     (Wireframes & UI)*  
 - 📌 [**Trello Board**](https://trello.com/invite/b/67f18f5bc17672326a49b6b6/ATTIe66d367fedba29577872abdc0a9ae4c47BC2DE58/spotflash) *(Task Management)*  
 
