@@ -2,7 +2,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// إنشاء مجلد التحميل إذا لم يكن موجوداً
 const uploadDir = path.join(__dirname, '../uploads/screens');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -27,13 +26,13 @@ const fileFilter = (req, file, cb) => {
   if (mimetype && extname) {
     cb(null, true);
   } else {
-    cb(new Error('يسمح فقط بملفات الصور (JPEG, JPG, PNG, GIF)'));
+    cb(new Error('just allow (JPEG, JPG, PNG, GIF)'));
   }
 };
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }, 
   fileFilter: fileFilter
 });
 

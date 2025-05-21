@@ -67,7 +67,6 @@ exports.updateUserProfile = async (req, res) => {
     const updates = { fullName, phoneNumber };
 
     if (req.file) {
-      // حذف الصورة القديمة إذا كانت موجودة
       const user = await User.findById(req.user.id);
       if (user.profilePicture) {
         const oldImagePath = path.join(__dirname, '..', user.profilePicture);
@@ -76,7 +75,6 @@ exports.updateUserProfile = async (req, res) => {
         }
       }
 
-      // تحديث المسار مع تعديل المسار النسبي
       updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
     }
 
@@ -109,7 +107,6 @@ exports.updateUserRole = async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
 
-    // التحقق من صحة الـ role
     if (!['admin', 'user'].includes(role)) {
       return res.status(400).json({
         success: false,
@@ -117,7 +114,6 @@ exports.updateUserRole = async (req, res) => {
       });
     }
 
-    // البحث عن المستخدم وتحديثه
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { role },

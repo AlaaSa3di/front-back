@@ -100,8 +100,28 @@ exports.getSpaceById = async (req, res) => {
     });
   }
 };
-
-// Update space
+// Get spaces by owner (current user)
+// Get spaces by owner (current user)
+exports.getMySpaces = async (req, res) => {
+  try {
+    const spaces = await Space.find({ 
+      owner: req.user.id, 
+      isDeleted: false 
+    }).populate('owner', 'fullName email');
+    
+    res.status(200).json({
+      success: true,
+      count: spaces.length,
+      data: spaces
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch your spaces',
+      error: error.message
+    });
+  }
+};// Update space
 exports.updateSpace = async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);

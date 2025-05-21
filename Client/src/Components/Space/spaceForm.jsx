@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2'; 
 
 const SpaceForm = () => {
   const navigate = useNavigate();
@@ -50,14 +50,12 @@ const SpaceForm = () => {
       isScreenInstalled: false
     },
     validationSchema,
-    // We'll handle the submit separately to ensure images are uploaded
     onSubmit: () => {
       handleFormSubmit();
     }
   });
 
   const handleFormSubmit = async () => {
-    // Validate if images are uploaded
     if (uploadedFiles.length === 0) {
       Swal.fire({
         title: 'Missing Images',
@@ -97,7 +95,7 @@ const SpaceForm = () => {
           icon: 'success',
           confirmButtonColor: '#FDB827'
         }).then(() => {
-          navigate('/spaces');
+          navigate('/');
         });
       }
     } catch (error) {

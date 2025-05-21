@@ -1,115 +1,113 @@
-import { FaFacebookF, FaInstagram, FaXTwitter, FaYoutube } from "react-icons/fa6";
-import { IoRocketOutline, IoEarthOutline, IoStarOutline, IoNewspaperOutline } from "react-icons/io5";
-import logo from '../Assets/logo.png';
+import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
+import { MdLocationOn, MdEmail, MdPhone } from "react-icons/md";
+import logo from "../images/logo.png";
+
 const Footer = () => {
   return (
-    <footer className="bg-black text-[#F1F1F1]">
-      {/* Top Wave Divider */}
-      
-      
-      {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto pt-8 pb-16 px-6 md:px-8">
-        {/* Top Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start mb-12 border-b border-[#F1F1F1]/20 pb-8">
-          <div className="mb-8 md:mb-0 md:max-w-xs">
+    <footer className="bg-black text-gray-300">
+      <div className="max-w-7xl mx-auto pt-12 pb-8 px-6 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {/* Company Info */}
+          <div className="mb-8 md:mb-0">
             <div className="flex items-center mb-4">
-              <img src={logo} alt="NASA Logo" className="w-30 " />
-              {/* <h2 className="text-2xl font-bold text-[#FDB827]">ORBITRA</h2> */}
+              <img src={logo} alt="Digital Screens Logo" className="h-10" />
             </div>
-            <p className="text-[#F1F1F1]/80 text-sm">
-              Delivering the latest space news, discoveries, and exploration updates in real time.
+            <p className="text-gray-400 text-sm mb-4">
+              The leading platform for outdoor digital advertising in Jordan.
             </p>
-            
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 text-[#F1F1F1]">Subscribe to Updates</h3>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="bg-[#23120B]/80 text-sm rounded-l-md px-4 py-2 flex-grow text-[#F1F1F1] focus:outline-none focus:ring-2 focus:ring-[#FDB827]"
-                />
-                <button className="bg-[#FDB827] hover:bg-[#FDB827]/80 text-[#23120B] text-sm font-medium px-4 py-2 rounded-r-md transition duration-300">
-                  Subscribe
-                </button>
-              </div>
-            </div>
+            <button
+              className={`w-full py-3 rounded-md font-medium text-black transition-colors bg-[#FDB827] hover:bg-[#F26B0F]/90`}
+            >
+              Contact Us
+            </button>
           </div>
-          
-          {/* Menu Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
-            {/* Column 1 */}
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 flex items-center text-[#FDB827]">
-                <IoNewspaperOutline className="mr-2" />
-                Discover
-              </h3>
-              <ul className="space-y-2 text-sm text-[#F1F1F1]/80">
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Latest News</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Media Gallery</a></li>
-                <li>
-                  <a href="#" className="flex items-center hover:text-[#FDB827] transition duration-300">
-                    Featured Artical
-                  </a>
-                </li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Events Calendar</a></li>
-              </ul>
-            </div>
-            
-            {/* Column 2 */}
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 flex items-center text-[#FDB827]">
-                <IoRocketOutline className="mr-2" />
-                Exploration
-              </h3>
-              <ul className="space-y-2 text-sm text-[#F1F1F1]/80">
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Missions</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Humans in Space</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Spacecraft</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Launch Schedule</a></li>
-              </ul>
-            </div>
-            
-            {/* Column 3 */}
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 flex items-center text-[#FDB827]">
-                <IoStarOutline className="mr-2" />
-                Universe
-              </h3>
-              <ul className="space-y-2 text-sm text-[#F1F1F1]/80">
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Solar System</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Astrobiology & Alien Life</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Astronomy & Space Science</a></li>
-                <li><a href="#" className="hover:text-[#FDB827] transition duration-300">Space Technology & Innovation</a></li>
-              </ul>
-            </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-[#FDB827] border-b border-[#FDB827]/30 pb-2">
+              Quick Links
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <a
+                  href="/screens"
+                  className="hover:text-[#FDB827] transition duration-300"
+                >
+                  Browse Screens
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/pricing"
+                  className="hover:text-[#FDB827] transition duration-300"
+                >
+                  Pricing
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/terms"
+                  className="hover:text-[#FDB827] transition duration-300"
+                >
+                  Terms & Policy
+                </a>
+              </li>
+            </ul>
+          </div>
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-[#FDB827] border-b border-[#FDB827]/30 pb-2">
+              Contact
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start">
+                <MdLocationOn className="mt-1 mr-2 text-[#FDB827]" />
+                <span>Zarqa, Jordan</span>
+              </li>
+              <li className="flex items-center">
+                <MdEmail className="mr-2 text-[#FDB827]" />
+                <a
+                  href="mailto:spot.flash2025@gmail.com"
+                  className="hover:text-[#FDB827]"
+                >
+                  spot.flash2025@gmail.com
+                </a>
+              </li>
+              <li className="flex items-center">
+                <MdPhone className="mr-2 text-[#FDB827]" />
+                <a href="tel:+962786860863" className="hover:text-[#FDB827]">
+                  +962 78 686 0863
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-        
-        {/* Bottom Section */}
+
+        <div className="border-t border-gray-700 my-6"></div>
+
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex flex-wrap justify-center md:justify-start space-x-4 mb-4 md:mb-0 text-xs text-[#F1F1F1]/70">
-            <a href="#" className="hover:text-[#FDB827] transition duration-300">About</a>
-            <span>|</span>
-            <a href="#" className="hover:text-[#FDB827] transition duration-300">Contact</a>
-            <span>|</span>
-            <a href="#" className="hover:text-[#FDB827] transition duration-300">Privacy Policy</a>
-            <span>|</span>
-            <a href="#" className="hover:text-[#FDB827] transition duration-300">Terms of Use</a>
+          <div className="text-xs text-gray-500 mb-4 md:mb-0">
+            © {new Date().getFullYear()} Digital Screens. All rights reserved.
           </div>
-          
-          {/* Social Media */}
-          <div className="flex space-x-3">
-            <a href="#" className="bg-[#23120B] hover:bg-[#FDB827] p-2 rounded-full text-[#F1F1F1] hover:text-[#23120B] transition duration-300">
-              <FaFacebookF className="text-sm" />
+
+          <div className="flex space-x-4">
+            <a
+              href="https://facebook.com"
+              className="bg-gray-800 hover:bg-[#FDB827] p-2 rounded-full text-gray-300 hover:text-gray-900"
+            >
+              <FaFacebookF size={16} />
             </a>
-            <a href="#" className="bg-[#23120B] hover:bg-[#FDB827] p-2 rounded-full text-[#F1F1F1] hover:text-[#23120B] transition duration-300">
-              <FaInstagram className="text-sm" />
+            <a
+              href="https://instagram.com"
+              className="bg-gray-800 hover:bg-[#FDB827] p-2 rounded-full text-gray-300 hover:text-gray-900"
+            >
+              <FaInstagram size={16} />
             </a>
-            <a href="#" className="bg-[#23120B] hover:bg-[#FDB827] p-2 rounded-full text-[#F1F1F1] hover:text-[#23120B] transition duration-300">
-              <FaXTwitter className="text-sm" />
-            </a>
-            <a href="#" className="bg-[#23120B] hover:bg-[#FDB827] p-2 rounded-full text-[#F1F1F1] hover:text-[#23120B] transition duration-300">
-              <FaYoutube className="text-sm" />
+            <a
+              href="https://wa.me/962786860863"
+              className="bg-gray-800 hover:bg-[#FDB827] p-2 rounded-full text-gray-300 hover:text-gray-900"
+            >
+              <FaWhatsapp size={16} />
             </a>
           </div>
         </div>

@@ -3,21 +3,21 @@ const Space = require('../Models/spaceModel');
 const path = require('path');
 const fs = require('fs');
 
-// إنشاء شاشة جديدة
+// Create a new screen
 exports.createScreen = async (req, res) => {
   try {
     const { spaceId, dailyPrice, installedDimensions, specifications } = req.body;
     
-    // التحقق من وجود المساحة
+    // Check if space exists
     const space = await Space.findById(spaceId);
     if (!space) {
       return res.status(404).json({
         success: false,
-        message: 'المساحة غير موجودة'
+        message: 'Space not found'
       });
     }
 
-    // معالجة صورة الشاشة
+    // Process screen image
     let screenImage = {};
     if (req.file) {
       screenImage = {
@@ -38,28 +38,35 @@ exports.createScreen = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'تم إنشاء الشاشة بنجاح',
+      message: 'Screen created successfully',
       data: screen
     });
   } catch (error) {
-    // حذف الصورة إذا حدث خطأ
+    // Delete uploaded file if error occurs
     if (req.file) {
       fs.unlinkSync(path.join(__dirname, '../uploads/screens', req.file.filename));
     }
     res.status(500).json({
       success: false,
-      message: 'فشل في إنشاء الشاشة',
+      message: 'Failed to create screen',
       error: error.message
     });
   }
 };
 
-// الحصول على جميع الشاشات
-exports.getAllScreens = async (req, res) => {
+// Get all active screens
+exports.getScreensActive = async (req, res) => {
   try {
-    const screens = await Screen.find()
-      .populate('spaceDetails', 'title location dimensions')
-      .populate('ownerDetails', 'fullName email');
+    // Get all active screens with space and owner details
+    const screens = await Screen.find({ status: 'active' })
+      .populate({
+        path: 'spaceDetails',
+        select: 'title location dimensions spaceType'
+      })
+      .populate({
+        path: 'ownerDetails',
+        select: 'fullName email'
+      });
 
     res.status(200).json({
       success: true,
@@ -69,23 +76,51 @@ exports.getAllScreens = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'فشل في جلب بيانات الشاشات',
+      message: 'Failed to fetch screens data',
       error: error.message
     });
   }
 };
 
-// الحصول على شاشة محددة
+// Get all screens
+exports.getAllScreens = async (req, res) => {
+  try {
+    // Get all screens with space and owner details
+    const screens = await Screen.find()
+      .populate({
+        path: 'spaceDetails',
+        select: 'title location dimensions spaceType'
+      })
+      .populate({
+        path: 'ownerDetails',
+        select: 'fullName email'
+      });
+
+    res.status(200).json({
+      success: true,
+      count: screens.length,
+      data: screens
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch screens data',
+      error: error.message
+    });
+  }
+};
+
+// Get specific screen
 exports.getScreen = async (req, res) => {
   try {
     const screen = await Screen.findById(req.params.id)
-      .populate('spaceDetails', 'title location dimensions')
+      .populate('spaceDetails', 'title location dimensions spaceType')
       .populate('ownerDetails', 'fullName email phoneNumber');
 
     if (!screen) {
       return res.status(404).json({
         success: false,
-        message: 'الشاشة غير موجودة'
+        message: 'Screen not found'
       });
     }
 
@@ -96,45 +131,83 @@ exports.getScreen = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'فشل في جلب بيانات الشاشة',
+      message: 'Failed to fetch screen data',
       error: error.message
     });
   }
 };
 
-// تحديث شاشة
+// Get available space types
+exports.getSpaceTypes = async (req, res) => {
+  try {
+    const spaceTypes = await Screen.aggregate([
+      { $match: { status: 'active' } },
+      { $lookup: {
+          from: 'spaces',
+          localField: 'space',
+          foreignField: '_id',
+          as: 'spaceDetails'
+        }
+      },
+      { $unwind: '$spaceDetails' },
+      { $group: {
+          _id: '$spaceDetails.spaceType',
+          count: { $sum: 1 }
+        }
+      },
+      { $project: {
+          spaceType: '$_id',
+          count: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: spaceTypes
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch space types',
+      error: error.message
+    });
+  }
+};
+
+// Update screen
 exports.updateScreen = async (req, res) => {
   try {
-    const { dailyPrice, installedDimensions, specifications } = req.body;
+    const { dailyPrice, installedDimensions, specifications, status } = req.body;
     const screen = await Screen.findById(req.params.id);
 
     if (!screen) {
       return res.status(404).json({
         success: false,
-        message: 'الشاشة غير موجودة'
+        message: 'Screen not found'
       });
     }
 
-    // التحقق من ملكية الشاشة
+    // Check screen ownership
     if (screen.owner.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'غير مصرح لك بتحديث هذه الشاشة'
+        message: 'Not authorized to update this screen'
       });
     }
 
-    // تحديث الحقول
+    // Update fields
     if (dailyPrice) screen.dailyPrice = dailyPrice;
-    if (installedDimensions) screen.installedDimensions = JSON.parse(installedDimensions);
-    if (specifications) screen.specifications = JSON.parse(specifications);
+    if (installedDimensions) screen.installedDimensions = installedDimensions;
+    if (specifications) screen.specifications = specifications;
+    if (status) screen.status = status;
 
-    // تحديث الصورة إذا تم رفع جديدة
+    // Update image if new one was uploaded
     if (req.file) {
-      // حذف الصورة القديمة إذا كانت موجودة
       if (screen.screenImage?.path) {
         fs.unlinkSync(path.join(__dirname, '../', screen.screenImage.path));
       }
-
       screen.screenImage = {
         filename: req.file.filename,
         path: path.join('uploads', 'screens', req.file.filename),
@@ -146,19 +219,20 @@ exports.updateScreen = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'تم تحديث الشاشة بنجاح',
+      message: 'Screen updated successfully',
       data: screen
     });
   } catch (error) {
+    console.error('Error details:', error);
     res.status(500).json({
       success: false,
-      message: 'فشل في تحديث الشاشة',
+      message: 'Failed to update screen',
       error: error.message
     });
   }
 };
 
-// حذف شاشة
+// Delete screen
 exports.deleteScreen = async (req, res) => {
   try {
     const screen = await Screen.findById(req.params.id);
@@ -166,19 +240,19 @@ exports.deleteScreen = async (req, res) => {
     if (!screen) {
       return res.status(404).json({
         success: false,
-        message: 'الشاشة غير موجودة'
+        message: 'Screen not found'
       });
     }
 
-    // التحقق من ملكية الشاشة
+    // Check screen ownership
     if (screen.owner.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'غير مصرح لك بحذف هذه الشاشة'
+        message: 'Not authorized to delete this screen'
       });
     }
 
-    // حذف صورة الشاشة إذا كانت موجودة
+    // Delete screen image if exists
     if (screen.screenImage?.path) {
       fs.unlinkSync(path.join(__dirname, '../', screen.screenImage.path));
     }
@@ -187,12 +261,58 @@ exports.deleteScreen = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'تم حذف الشاشة بنجاح'
+      message: 'Screen deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'فشل في حذف الشاشة',
+      message: 'Failed to delete screen',
+      error: error.message
+    });
+  }
+};
+
+// Update screen status (active/maintenance/out_of_service)
+exports.updateScreenStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const screen = await Screen.findById(req.params.id);
+
+    if (!screen) {
+      return res.status(404).json({
+        success: false,
+        message: 'Screen not found'
+      });
+    }
+
+    // Check screen ownership
+    if (screen.owner.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this screen'
+      });
+    }
+
+    // Validate requested status
+    if (!['active', 'maintenance', 'out_of_service'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be one of: active, maintenance, out_of_service'
+      });
+    }
+
+    screen.status = status;
+    await screen.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Screen status updated successfully',
+      data: screen
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update screen status',
       error: error.message
     });
   }

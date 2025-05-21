@@ -9,10 +9,12 @@ router.post('/', verifyToken, upload.array('images', 5), spaceController.createS
 
 // Get all active spaces
 router.get('/', spaceController.getAllSpaces);
+// Get spaces owned by current user
+router.get('/my-spaces', verifyToken, spaceController.getMySpaces);
+
 
 // Get space by ID
 router.get('/:id', spaceController.getSpaceById);
-
 // Update space
 router.put('/:id', verifyToken, spaceController.updateSpace);
 

@@ -1,4 +1,3 @@
-// Models/spaceModel.js
 const mongoose = require('mongoose');
 
 const spaceSchema = new mongoose.Schema({

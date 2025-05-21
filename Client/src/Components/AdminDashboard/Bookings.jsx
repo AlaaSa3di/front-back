@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../api/axiosConfig';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
+import Pagination from '../common/Pagination'; 
 
 const BookingsPage = () => {
   const [bookings, setBookings] = useState([]);
@@ -21,7 +22,6 @@ const BookingsPage = () => {
     const fetchBookings = async () => {
       try {
         const response = await api.get('/bookings');
-        console.log('Bookings data:', response.data);
         setBookings(response.data.data.bookings);
         setLoading(false);
       } catch (err) {
@@ -109,14 +109,14 @@ const BookingsPage = () => {
       )}
 
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">My Bookings</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Bookings Management</h1>
         
         <div className="relative inline-block text-left">
           <select
             value={filterPaymentStatus}
             onChange={(e) => {
               setFilterPaymentStatus(e.target.value);
-              setCurrentPage(1); // Reset to first page when filter changes
+              setCurrentPage(1);
             }}
             className="block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#FDB827] focus:border-[#FDB827] rounded-md"
           >
@@ -155,6 +155,28 @@ const BookingsPage = () => {
                   <div className="p-6 flex-1">
                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                       <div className="flex-1">
+                        {/* User Information Card */}
+                        <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                          <h3 className="font-medium text-gray-700 mb-2">User Information:</h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-gray-600">
+                                <span className="font-medium">Name:</span> {booking.userDetails?.fullName || 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-600">
+                                <span className="font-medium">Email:</span> {booking.userDetails?.email || 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-600">
+                                <span className="font-medium">Phone:</span> {booking.userDetails?.phoneNumber || 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
                         <h2 className="text-xl font-bold text-gray-800 mb-2">
                           {booking.screenDetails?.spaceDetails?.title || 'Advertisement Screen'}
                         </h2>
@@ -254,50 +276,11 @@ const BookingsPage = () => {
             ))}
           </div>
           
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <nav className="flex items-center space-x-2">
-                <button
-                  onClick={() => paginate(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === 1 
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  &lt;
-                </button>
-                
-                {[...Array(totalPages).keys()].map(number => (
-                  <button
-                    key={number + 1}
-                    onClick={() => paginate(number + 1)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === number + 1
-                        ? 'bg-[#FDB827] text-black font-medium'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  >
-                    {number + 1}
-                  </button>
-                ))}
-                
-                <button
-                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === totalPages
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  &gt;
-                </button>
-              </nav>
-            </div>
-          )}
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={paginate} 
+          />
         </>
       )}
     </div>

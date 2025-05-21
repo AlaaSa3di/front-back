@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Swal from 'sweetalert2';
+import PaymentPopup from '../Payment/pay'; // New component
 
 const BookingForm = () => {
   const { screenId } = useParams();
@@ -11,9 +12,11 @@ const BookingForm = () => {
   const [screen, setScreen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [currentBooking, setCurrentBooking] = useState(null);
   const [formData, setFormData] = useState({
     startDate: new Date(),
-    endDate: new Date(Date.now() + 86400000), // Tomorrow's date
+    endDate: new Date(Date.now() + 86400000),
     notes: '',
     design: null
   });
@@ -23,7 +26,6 @@ const BookingForm = () => {
     totalPrice: 0
   });
 
-  // Fetch screen data
   useEffect(() => {
     const fetchScreen = async () => {
       try {
@@ -48,7 +50,6 @@ const BookingForm = () => {
     fetchScreen();
   }, [screenId]);
 
-  // Calculate price when dates change
   useEffect(() => {
     if (formData.startDate && formData.endDate) {
       const days = Math.ceil((formData.endDate - formData.startDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -95,16 +96,9 @@ const BookingForm = () => {
         }
       });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Booking Successful!',
-        text: 'Your screen has been booked successfully.',
-        confirmButtonColor: '#FDB827'
-      }).then(() => {
-        navigate('/bookings', {
-          state: { booking: response.data.data.booking }
-        });
-      });
+      setCurrentBooking(response.data.data.booking);
+      setShowPaymentPopup(true);
+      
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -112,8 +106,20 @@ const BookingForm = () => {
         text: err.response?.data?.message || 'An error occurred during booking process',
         confirmButtonColor: '#FDB827'
       });
+    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Booking Successful!',
+      text: 'Keep follow up on your profile to check approve your bookings.',
+      confirmButtonColor: '#FDB827'
+    }).then(() => {
+      navigate('/');
+    });
   };
 
   if (loading && !screen) return (
@@ -210,7 +216,7 @@ const BookingForm = () => {
                 <p className="mb-2 text-sm text-gray-500">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-gray-500">JPG, PNG, PDF, PSD, AI (Max: 10MB)</p>
+                <p className="text-xs text-gray-500">JPG, PNG, PDF, PSD, AI (Max: 5MB)</p>
               </div>
               <input type="file" className="hidden" onChange={handleFileChange} accept="image/*,.pdf,.psd,.ai" />
             </label>
@@ -230,6 +236,15 @@ const BookingForm = () => {
           {isSubmitting ? 'Processing...' : 'Confirm Booking'}
         </button>
       </form>
+
+      {/* Payment Popup */}
+      {showPaymentPopup && currentBooking && (
+        <PaymentPopup 
+          booking={currentBooking}
+          onClose={() => setShowPaymentPopup(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 };

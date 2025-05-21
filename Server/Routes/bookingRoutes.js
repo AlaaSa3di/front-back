@@ -1,11 +1,11 @@
 const express = require('express');
 const bookingController = require('../Controllers/bookingController');
+const paymentsController = require('../Controllers/paymentsController');
 const authController = require('../Controllers/authController');
 const { verifyToken } = require('../Middlewares/authMiddleware');
 
 const router = express.Router();
 
-// Protect all routes after this middleware
 router.use(authController.protect);
 
 router.post(
@@ -16,7 +16,8 @@ router.post(
 
 router.get(
   '/',
-  verifyToken,bookingController.getAllBookings
+  verifyToken,
+  bookingController.getAllBookings
 );
 
 router.get(
@@ -24,13 +25,47 @@ router.get(
   bookingController.getBooking
 );
 
-// Restrict to admin only
+router.post(
+  '/:bookingId/create-payment',
+  paymentsController.createPayPalOrder
+);
+
+router.post(
+  '/:bookingId/capture-payment',
+  paymentsController.capturePayPalPayment
+);
+
 router.use(authController.restrictTo('admin'));
-router.patch('/:id', verifyToken, bookingController.updateBooking); // نقطة النهاية الجديدة
 
 router.patch(
   '/:id/status',
   bookingController.updateBookingStatus
+);
+
+router.patch(
+  '/:id/approve',
+  bookingController.approveBooking
+);
+
+router.patch(
+  '/:id/reject',
+  bookingController.rejectBooking
+);
+
+router.patch(
+  '/:id/complete',
+  bookingController.completeBooking
+);
+
+router.post(
+  '/:bookingId/refund',
+  paymentsController.refundPayment
+);
+
+router.patch(
+  '/:id',
+  verifyToken,
+  bookingController.updateBooking
 );
 
 router.delete(

@@ -4,25 +4,25 @@ const bookingSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'يجب أن ينتمي الحجز إلى مستخدم']
+    required: [true, 'Booking must belong to a user']
   },
   screen: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Screen',
-    required: [true, 'يجب أن ينتمي الحجز إلى شاشة']
+    required: [true, 'Booking must belong to a screen']
   },
   startDate: {
     type: Date,
-    required: [true, 'يجب تحديد تاريخ البدء']
+    required: [true, 'Start date must be specified']
   },
   endDate: {
     type: Date,
-    required: [true, 'يجب تحديد تاريخ الانتهاء'],
+    required: [true, 'End date must be specified'],
     validate: {
       validator: function(value) {
         return value > this.startDate;
       },
-      message: 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء'
+      message: 'End date must be after start date'
     }
   },
   design: {
@@ -39,21 +39,33 @@ const bookingSchema = new mongoose.Schema({
   },
   totalPrice: {
     type: Number,
-    required: [true, 'يجب حساب السعر الإجمالي']
+    required: [true, 'Total price must be calculated']
   },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  paymentDetails: {
+    method: {
+      type: String,
+      enum: ['paypal', 'card'],
+    },
+    id: String,
+    status: String,
+    amount: Number,
+    currency: String,
+    refund: Object,
+    capturedAt: Date
   },
-  updatedAt: Date
+  days: {
+    type: Number,
+    required: true
+  }
 }, {
   toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  toObject: { virtuals: true },
+  timestamps: true
 });
 
 // Virtual populate
@@ -73,10 +85,12 @@ bookingSchema.virtual('screenDetails', {
 
 // Calculate total price before saving
 bookingSchema.pre('save', async function(next) {
-  const days = Math.ceil((this.endDate - this.startDate) / (1000 * 60 * 60 * 24)) + 1;
-  const screen = await mongoose.model('Screen').findById(this.screen);
-  this.totalPrice = days * screen.dailyPrice;
-  this.updatedAt = Date.now();
+  if (this.isModified('startDate') || this.isModified('endDate') || this.isNew) {
+    const days = Math.ceil((this.endDate - this.startDate) / (1000 * 60 * 60 * 24)) + 1;
+    const screen = await mongoose.model('Screen').findById(this.screen);
+    this.totalPrice = days * screen.dailyPrice;
+    this.days = days;
+  }
   next();
 });
 

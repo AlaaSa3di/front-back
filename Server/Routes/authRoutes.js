@@ -6,9 +6,9 @@ const { verifyToken } = require('../Middlewares/authMiddleware');
 // Public routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/logout', authController.logout);
 
 // Protected routes
 router.get('/me',verifyToken ,authController.getMe);
-router.post('/logout', authController.logout);
 
 module.exports = router;

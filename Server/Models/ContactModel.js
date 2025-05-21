@@ -5,21 +5,21 @@ const ContactMessageSchema = new mongoose.Schema(
   {
     name: { 
       type: String, 
-      required: [true, 'الاسم مطلوب'],
+      required: [true, 'Name is required'],
       trim: true,
-      maxlength: [50, 'الاسم لا يمكن أن يتجاوز 50 حرفاً']
+      maxlength: [50, 'Name cannot exceed 50 characters']
     },
     email: { 
       type: String, 
-      required: [true, 'البريد الإلكتروني مطلوب'],
+      required: [true, 'Email is required'],
       lowercase: true,
-      validate: [validator.isEmail, 'يرجى تقديم بريد إلكتروني صحيح']
+      validate: [validator.isEmail, 'Please provide a valid email']
     },
     message: { 
       type: String, 
-      required: [true, 'الرسالة مطلوبة'],
-      minlength: [10, 'الرسالة يجب أن تحتوي على الأقل على 10 أحرف'],
-      maxlength: [1000, 'الرسالة لا يمكن أن تتجاوز 1000 حرف']
+      required: [true, 'Message is required'],
+      minlength: [10, 'Message must be at least 10 characters long'],
+      maxlength: [1000, 'Message cannot exceed 1000 characters']
     },
     replies: [{
       message: { type: String, required: true },

@@ -39,50 +39,33 @@ const upload = multer({
 exports.uploadDesign = upload;
 
 exports.createBooking = catchAsync(async (req, res, next) => {
-    // 1. التحقق من صحة التواريخ
     const startDate = new Date(req.body.startDate);
     const endDate = new Date(req.body.endDate);
   
     if (isNaN(startDate.getTime())) {
-      return next(createAppError('تاريخ البدء غير صالح', 400));
+      return next(createAppError('Invalid start date', 400));
     }
     if (isNaN(endDate.getTime())) {
-      return next(createAppError('تاريخ الانتهاء غير صالح', 400));
+      return next(createAppError('Invalid end date', 400));
     }
     if (endDate <= startDate) {
-      return next(createAppError('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 400));
+      return next(createAppError('End date must be after start date', 400));
     }
   
-    // 2. جلب بيانات الشاشة مع التحقق من السعر اليومي
     const screen = await Screen.findById(req.body.screen).select('+dailyPrice +status');
     if (!screen) {
-      return next(createAppError('لا توجد شاشة بهذا المعرف', 404));
+      return next(createAppError('No screen found with this ID', 404));
     }
     if (screen.status !== 'active') {
-      return next(createAppError('هذه الشاشة غير متاحة للحجز حالياً', 400));
+      return next(createAppError('This screen is not currently available for booking', 400));
     }
     if (!screen.dailyPrice || screen.dailyPrice <= 0) {
-      return next(createAppError('لا يمكن الحجز على شاشة بدون سعر محدد', 400));
+      return next(createAppError('Cannot book a screen without a specified price', 400));
     }
   
-    // 3. حساب عدد الأيام والسعر الإجمالي
     const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
     const totalPrice = screen.dailyPrice * days;
   
-    // 4. التحقق من تعارض التواريخ
-    // const existingBookings = await Booking.find({
-    //   screen: req.body.screen,
-    //   status: { $in: ['pending', 'approved'] },
-    //   $or: [
-    //     { startDate: { $lte: endDate }, endDate: { $gte: startDate } }
-    //   ]
-    // });
-  
-    // if (existingBookings.length > 0) {
-    //   return next(createAppError('هذه الشاشة محجوزة بالفعل في التواريخ المحددة', 400));
-    // }
-  
-    // 5. إنشاء الحجز
     const bookingData = {
       user: req.user.id,
       screen: req.body.screen,
@@ -91,7 +74,8 @@ exports.createBooking = catchAsync(async (req, res, next) => {
       totalPrice: totalPrice,
       days: days,
       notes: req.body.notes,
-      status: 'pending'
+      status: 'pending',
+      paymentStatus: 'pending'
     };
   
     if (req.file) {
@@ -105,7 +89,6 @@ exports.createBooking = catchAsync(async (req, res, next) => {
   
     const booking = await Booking.create(bookingData);
   
-    // 6. تحديث إحصائيات الشاشة
     await Screen.findByIdAndUpdate(req.body.screen, {
       $inc: { adsCount: 1 }
     });
@@ -121,62 +104,135 @@ exports.createBooking = catchAsync(async (req, res, next) => {
         }
       }
     });
-  });
+});
 
-  exports.getAllBookings = catchAsync(async (req, res, next) => {
-    const bookings = await Booking.find({}) // إزالة الفلترة وجلب جميع الحجوزات
-      .populate({
-        path: 'screenDetails',
-        select: 'installedDimensions dailyPrice specifications space status',
-        populate: {
-          path: 'spaceDetails',
-          select: 'title location'
-        }
-      })
-      .populate({
-        path: 'userDetails',
-        select: 'fullName email phoneNumber'
-      });
-  
-    res.status(200).json({
-      status: 'success',
-      results: bookings.length,
-      data: {
-        bookings
+exports.getAllBookings = catchAsync(async (req, res, next) => {
+  const bookings = await Booking.find({})
+    .populate({
+      path: 'screenDetails',
+      select: 'installedDimensions dailyPrice specifications space status',
+      populate: {
+        path: 'spaceDetails',
+        select: 'title location'
       }
+    })
+    .populate({
+      path: 'userDetails',
+      select: 'fullName email phoneNumber'
     });
+
+  res.status(200).json({
+    status: 'success',
+    results: bookings.length,
+    data: {
+      bookings
+    }
   });
-  
-  exports.getBooking = catchAsync(async (req, res, next) => {
-    const booking = await Booking.findById(req.params.id)
-      .populate({
-        path: 'screenDetails',
-        select: 'installedDimensions dailyPrice specifications space status',
-        populate: {
-          path: 'spaceDetails',
-          select: 'title location'
-        }
-      })
-      .populate({
-        path: 'userDetails',
-        select: 'fullName email phoneNumber'
-      });
-  
-    if (!booking) {
-      return next(createAppError('لا يوجد حجز بهذا المعرف', 404));
-    }
-  
-    if (req.user.role !== 'admin' && booking.user.toString() !== req.user.id) {
-      return next(createAppError('غير مصرح لك بمشاهدة هذا الحجز', 403));
-    }
-  
-    res.status(200).json({
-      status: 'success',
-      data: {
-        booking
+});
+
+exports.getBooking = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findById(req.params.id)
+    .populate({
+      path: 'screenDetails',
+      select: 'installedDimensions dailyPrice specifications space status',
+      populate: {
+        path: 'spaceDetails',
+        select: 'title location'
       }
+    })
+    .populate({
+      path: 'userDetails',
+      select: 'fullName email phoneNumber'
     });
+
+  if (!booking) {
+    return next(createAppError('No booking found with this ID', 404));
+  }
+
+  if (req.user.role !== 'admin' && booking.user.toString() !== req.user.id) {
+    return next(createAppError('You are not authorized to view this booking', 403));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking
+    }
   });
+});
+
+exports.approveBooking = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findById(req.params.id);
+  
+  if (!booking) {
+    return next(createAppError('No booking found with this ID', 404));
+  }
+
+  if (booking.status !== 'pending') {
+    return next(createAppError('Cannot approve booking in its current status', 400));
+  }
+
+  booking.status = 'approved';
+  await booking.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking,
+      paymentRequired: true,
+      paymentUrl: `/bookings/${booking._id}/pay`
+    }
+  });
+});
+
+exports.rejectBooking = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findById(req.params.id);
+  
+  if (!booking) {
+    return next(createAppError('No booking found with this ID', 404));
+  }
+
+  if (booking.status !== 'pending' && booking.status !== 'approved') {
+    return next(createAppError('Cannot reject booking in its current status', 400));
+  }
+
+  if (booking.paymentStatus === 'paid') {
+    booking.paymentStatus = 'refunded';
+  }
+
+  booking.status = 'rejected';
+  await booking.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking
+    }
+  });
+});
+
+exports.completeBooking = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findById(req.params.id);
+  
+  if (!booking) {
+    return next(createAppError('No booking found with this ID', 404));
+  }
+
+  if (booking.status !== 'approved' || booking.paymentStatus !== 'paid') {
+    return next(createAppError('Cannot complete booking in its current status', 400));
+  }
+
+  booking.status = 'completed';
+  await booking.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking
+    }
+  });
+});
+
 exports.updateBookingStatus = catchAsync(async (req, res, next) => {
   const booking = await Booking.findById(req.params.id);
 
@@ -188,9 +244,11 @@ exports.updateBookingStatus = catchAsync(async (req, res, next) => {
   if (req.user.role !== 'admin') {
     return next(createAppError('You are not authorized to update booking status', 403));
   }
-// السماح بتحديث الحالة أو حالة الدفع
+
   booking.status = req.body.status;
-  booking.updatedAt = Date.now();
+  if (req.body.paymentStatus) {
+    booking.paymentStatus = req.body.paymentStatus;
+  }
   await booking.save();
 
   res.status(200).json({
@@ -229,28 +287,27 @@ exports.deleteBooking = catchAsync(async (req, res, next) => {
 });
 
 exports.updateBooking = catchAsync(async (req, res, next) => {
-    const booking = await Booking.findById(req.params.id);
+  const booking = await Booking.findById(req.params.id);
+
+  if (!booking) {
+    return next(createAppError('No booking found with this ID', 404));
+  }
+
+  // Check permissions (admin or booking owner)
+  if (req.user.role !== 'admin' && booking.user.toString() !== req.user.id) {
+    return next(createAppError('You are not authorized to update this booking', 403));
+  }
+
+  // Allow updating status or payment status
+  if (req.body.status) booking.status = req.body.status;
+  if (req.body.paymentStatus) booking.paymentStatus = req.body.paymentStatus;
   
-    if (!booking) {
-      return next(createAppError('لا يوجد حجز بهذا المعرف', 404));
+  await booking.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking
     }
-  
-    // التحقق من الصلاحيات (المسؤول أو صاحب الحجز)
-    if (req.user.role !== 'admin' && booking.user.toString() !== req.user.id) {
-      return next(createAppError('غير مصرح لك بتحديث هذا الحجز', 403));
-    }
-  
-    // السماح بتحديث الحالة أو حالة الدفع
-    if (req.body.status) booking.status = req.body.status;
-    if (req.body.paymentStatus) booking.paymentStatus = req.body.paymentStatus;
-    
-    booking.updatedAt = Date.now();
-    await booking.save();
-  
-    res.status(200).json({
-      status: 'success',
-      data: {
-        booking
-      }
-    });
   });
+});

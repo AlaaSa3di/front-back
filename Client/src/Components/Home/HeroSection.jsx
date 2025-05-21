@@ -1,54 +1,76 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axiosConfig";
 
 const HeroSection = () => {
+  const [heroData, setHeroData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchHeroData = async () => {
+      try {
+        const response = await api.get("/hero");
+        setHeroData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching hero data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeroData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-[#FDB827] border-t-transparent animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative h-screen w-full overflow-hidden">
       {/* Video Background */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div className="absolute inset-0 z-0">
         <video
-          className="absolute min-w-full min-h-full object-cover"
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
+          crossOrigin="anonymous"
+          className="w-full h-full object-cover"
+          onError={(e) => console.error("Video error:", e.target.error)}
         >
-          <source src="https://videos.pexels.com/video-files/854224/854224-hd_1280_720_30fps.mp4" type="video/mp4" />
-          {/* Fallback image if video doesn't load */}
-          <img
-            src="/path-to-fallback-image.jpg"
-            alt="SpaceX Rocket Launch"
-            className="absolute min-w-full min-h-full object-cover"
-          />
+          <source src={heroData.videoUrl} type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
+        <div className="absolute inset-0  bg-opacity-50"></div>
       </div>
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent"></div>
-
       {/* Content */}
-      <div className="relative h-full flex flex-col justify-center">
-        <div className="container mx-auto px-4 md:px-8 lg:px-12">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              ORBITRA – Your Portal to the Cosmos
-            </h1>
-            <p className="text-white text-base md:text-lg mb-8 leading-relaxed">
-              From the latest space missions to groundbreaking astronomical discoveries, ORBITRA keeps you connected to the universe. Explore breaking news, deep-space insights, and cosmic wonders—all in one orbit. Join us as we uncover the mysteries of the stars, planets, and galaxies beyond!
-            </p>
-            <Link
-                to="/Categories"
-                class="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-[#FDB827] backdrop-blur-lg px-6 py-2 text-base font-semibold text-white transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-xl  border border-white/20"
-              >
-                <span class="text-lg">Stay in Orbit</span>
-                <div
-                  class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]"
-                >
-                  <div class="relative h-full w-10 bg-white/30"></div>
-                </div>
-              </Link>
-          </div>
-        </div>
+      <div className="relative z-10 flex flex-col justify-center items-center h-full text-center px-4">
+<h1
+  className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fadeIn"
+  style={{ textShadow: '2px 2px 6px rgba(0, 0, 0, 0.7)' }}
+>
+  {heroData.title}
+</h1>
+<p
+  className="text-xl md:text-2xl text-white max-w-2xl mb-8 animate-fadeIn delay-100"
+  style={{ textShadow: '2px 2px 6px rgba(0, 0, 0, 0.7)' }}
+>
+  {heroData.subtitle}
+</p>
+
+        <button
+          onClick={() => navigate("/screens")}
+          className="bg-[#FDB827] hover:bg-[#F26B0F] text-black font-bold py-3 px-8 rounded-md text-lg transition-all duration-300 animate-fadeIn delay-200"
+        >
+          {heroData.buttonText}
+        </button>
       </div>
     </div>
   );

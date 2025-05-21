@@ -1,31 +1,37 @@
-import axios from 'axios';
+import api from '../api/axiosConfig'; 
 
-// تسجيل مستخدم جديد
 export const register = async (userData) => {
-  const response = await axios.post('http://localhost:8000/api/auth/register', userData, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await api.post('/auth/register', userData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Registration failed');
+  }
 };
 
-// تسجيل الدخول
 export const login = async (userData) => {
-  const response = await axios.post('/api/auth/login', userData, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await api.post('/auth/login', userData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Login failed');
+  }
 };
 
-// استرجاع بيانات المستخدم الحالي
 export const getMe = async () => {
-  const response = await axios.get('/api/auth/me', { withCredentials: true });
-  return response.data;
+  try {
+    const response = await api.get('/auth/me');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch user');
+  }
 };
 
-// تسجيل الخروج
-// export const logout = async () => {
-//   const response = await axios.post('/api/auth/logout', {}, { withCredentials: true });
-//   return response.data;
-// };
 export const logout = async () => {
-  const response = await axios.post('http://localhost:8000/api/auth/logout', {}, { 
-    withCredentials: true 
-  });
-  return response.data;
+  try {
+    const response = await api.post('/auth/logout');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Logout failed');
+  }
 };

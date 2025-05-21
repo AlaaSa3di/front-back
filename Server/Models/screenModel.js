@@ -4,7 +4,7 @@ const screenSchema = new mongoose.Schema({
   space: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Space',
-    required: [true, 'يجب تحديد المساحة المرتبطة بالشاشة']
+    required: [true, 'Associated space must be specified']
   },
   screenImage: {
     filename: String,
@@ -12,14 +12,14 @@ const screenSchema = new mongoose.Schema({
     url: String
   },
   installedDimensions: {
-    width: { type: Number, required: [true, 'يجب تحديد عرض الشاشة'] },
-    height: { type: Number, required: [true, 'يجب تحديد ارتفاع الشاشة'] },
+    width: { type: Number, required: [true, 'Screen width must be specified'] },
+    height: { type: Number, required: [true, 'Screen height must be specified'] },
     unit: { type: String, enum: ['cm', 'm', 'in'], default: 'm' }
   },
   dailyPrice: {
     type: Number,
-    required: [true, 'يجب تحديد سعر الإعلان اليومي'],
-    min: [0, 'لا يمكن أن يكون السعر أقل من الصفر']
+    required: [true, 'Daily advertising price must be specified'],
+    min: [0, 'Price cannot be less than zero']
   },
   adsCount: { type: Number, default: 0 },
   favoritesCount: { type: Number, default: 0 },
@@ -45,7 +45,7 @@ const screenSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// تعريف virtual لربط بيانات المساحة
+// Virtual to link space data
 screenSchema.virtual('spaceDetails', {
   ref: 'Space',
   localField: 'space',
@@ -53,12 +53,24 @@ screenSchema.virtual('spaceDetails', {
   justOne: true
 });
 
-// تعريف virtual لربط بيانات المالك
+// Virtual to link owner data
 screenSchema.virtual('ownerDetails', {
   ref: 'User',
   localField: 'owner',
   foreignField: '_id',
   justOne: true
+});
+
+screenSchema.index({ 
+  'spaceDetails.name': 'text',
+  'spaceDetails.location': 'text',
+  'specifications.resolution': 'text'
+}, { 
+  weights: {
+    'spaceDetails.name': 5,
+    'spaceDetails.location': 3,
+    'specifications.resolution': 1
+  }
 });
 
 module.exports = mongoose.model('Screen', screenSchema);

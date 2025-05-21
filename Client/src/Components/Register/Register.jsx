@@ -78,7 +78,6 @@ const Register = () => {
       console.error("Registration error:", error);
       
       if (error.response) {
-        // الطلب تم وصله للخادم وحصل على رد
         console.log("Error data:", error.response.data);
         console.log("Error status:", error.response.status);
         console.log("Error headers:", error.response.headers);
@@ -88,11 +87,9 @@ const Register = () => {
                        error.response.data?.toString() || 
                        "Validation failed";
       } else if (error.request) {
-        // الطلب تم إرساله ولكن لم يتم استلام رد
         console.log("Error request:", error.request);
         errorMessage = "No response received from server";
       } else {
-        // خطأ أثناء إعداد الطلب
         console.log("Error message:", error.message);
         errorMessage = error.message || "Request setup error";
       }
